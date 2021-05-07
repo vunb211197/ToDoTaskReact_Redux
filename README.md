@@ -1,4 +1,5 @@
-# Getting Started with Create React App VuNB
+# Getting Started with Create React App VuNB By React Redux
+
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
