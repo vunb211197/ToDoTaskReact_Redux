@@ -3,48 +3,26 @@ import React from "react";
 import TaskForm from "./components/TaskForm";
 import SearchAndSort from "./components/SearchAndSort";
 import TaskList from "./components/TaskList";
+import { connect } from "react-redux";
+import * as action from "./action/index";
+
 class App extends React.Component {
   constructor(props) {
     super(props);
-    if (localStorage && localStorage.getItem("tasks")) {
-      var tasks = JSON.parse(localStorage.getItem("tasks"));
-      this.state = {
-        tasks: tasks,
-        isDisplayForm: false,
-        taskEditing: null,
-        filter: {
-          name: "",
-          status: -1,
-        },
-        keyWord: "",
-        sort: {
-          by: "name",
-          value: 1,
-        },
-      };
-    } else {
-      this.state = {
-        tasks: [],
-        isDisplayForm: false,
-        taskEditing: null,
-        filter: {
-          name: "",
-          status: -1,
-        },
-        keyWord: "",
-        sort: {
-          by: "name",
-          value: 1,
-        },
-      };
-    }
+    this.state = {
+      taskEditing: null,
+      filter: {
+        name: "",
+        status: -1,
+      },
+      keyWord: "",
+      sort: {
+        by: "name",
+        value: 1,
+      },
+    };
 
-    this.showForm = this.showForm.bind(this);
-    this.hideForm = this.hideForm.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
-    this.updateStatus = this.updateStatus.bind(this);
-    this.findIndex = this.findIndex.bind(this);
-    this.deleteItem = this.deleteItem.bind(this);
+    this.showForm = this.props.showForm.bind(this);
     this.updateTask = this.updateTask.bind(this);
     this.onFilter = this.onFilter.bind(this);
     this.onSearch = this.onSearch.bind(this);
@@ -56,105 +34,20 @@ class App extends React.Component {
   //   //  có thể thực hiện gán giá trị state ở đây hoặc gắn khi khởi tạo
   // }
 
-  s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16)
-      .substring(1);
-  }
-
   showForm() {
+    this.props.showForm();
     this.setState({
-      isDisplayForm: true,
       taskEditing: null,
       keyWord: "",
     });
   }
-  hideForm() {
-    console.log("123");
-    this.setState({
-      isDisplayForm: false,
-    });
-  }
+  // hideForm() {
+  //   console.log("123");
+  //   this.setState({
+  //   });
+  // }
 
-  randomId() {
-    return (
-      this.s4() +
-      "-" +
-      this.s4() +
-      "-" +
-      this.s4() +
-      this.s4() +
-      "-" +
-      this.s4() +
-      this.s4() +
-      "-" +
-      this.s4()
-    );
-  }
 
-  onSubmit(data) {
-    console.log(data);
-    var tasks = this.state.tasks;
-    if (data.id === "") {
-      //  khởi tạo thằng task để nó thêm vào element
-      data.id = this.randomId();
-      tasks.push(data);
-      // gọi qua thằng này để nó tự cập nhật lại thông số state ( chứ nếu this.state.tasks.push(data) thì nó ko tự cập nhật)
-      this.setState({
-        tasks: tasks,
-      });
-    } else {
-      var index = this.findIndex(data.id);
-      if (index !== -1) {
-        tasks[index].name = data.name;
-        tasks[index].status = data.status;
-        this.setState({
-          tasks: tasks,
-        });
-      }
-    }
-    // console.log(this.state.tasks);
-    localStorage.setItem("tasks", JSON.stringify(this.state.tasks));
-  }
-
-  updateStatus(id) {
-    var index = this.findIndex(id);
-    var tasks = this.state.tasks;
-    if (index !== -1) {
-      tasks[index].status = !tasks[index].status;
-      this.setState({
-        tasks: tasks,
-      });
-      // console.log(this.state.tasks);
-      localStorage.setItem("tasks", JSON.stringify(this.state.tasks));
-    }
-  }
-
-  findIndex(id) {
-    var tasks = this.state.tasks;
-    var rs = -1;
-    tasks.forEach((task, index) => {
-      if (task.id === id) {
-        rs = index;
-      }
-    });
-    return rs;
-  }
-
-  deleteItem(id) {
-    var index = this.findIndex(id);
-    var tasks = this.state.tasks;
-    if (index !== -1) {
-      // xóa trong javascript
-      tasks.splice(index, 1);
-      this.setState({
-        tasks: tasks,
-      });
-      // console.log(this.state.tasks);
-      localStorage.setItem("tasks", JSON.stringify(this.state.tasks));
-      this.hideForm();
-    }
-  }
 
   updateTask(id) {
     var index = this.findIndex(id);
@@ -167,7 +60,7 @@ class App extends React.Component {
 
   showUpdateForm() {
     this.setState({
-      isDisplayForm: true,
+      // isDisplayForm: true,
     });
   }
 
@@ -189,19 +82,18 @@ class App extends React.Component {
   }
 
   onSort(sortBy, sortValue) {
-    console.log(sortBy,sortValue);
+    console.log(sortBy, sortValue);
     this.setState({
       sort: {
         by: sortBy,
         value: sortValue,
       },
     });
-
   }
 
   render() {
-    var tasks = this.state.tasks;
-    var isDisplayForm = this.state.isDisplayForm;
+    // var tasks = this.state.tasks;
+    var isDisplayForm = this.props.isDisplayForm;
     var checkDisplayForm = "";
     var classForm = "";
     var classTaskList = "";
@@ -209,35 +101,35 @@ class App extends React.Component {
     var key = this.state.keyWord;
     var sort = this.state.sort;
 
-    // kiểm tra nếu filter name khác mặc định
-    if (filter.name !== "") {
-      tasks = tasks.filter(
-        (task) =>
-          task.name.toLowerCase().indexOf(filter.name.toLocaleLowerCase()) !==
-          -1
-      );
-    }
-    // kiểm tra nếu filter status khác mặc định
-    if (filter.status !== -1) {
-      let filer_status = filter.status === 0 ? false : true;
-      tasks = tasks.filter((task) => task.status === filer_status);
-    }
+    // // kiểm tra nếu filter name khác mặc định
+    // if (filter.name !== "") {
+    //   tasks = tasks.filter(
+    //     (task) =>
+    //       task.name.toLowerCase().indexOf(filter.name.toLocaleLowerCase()) !==
+    //       -1
+    //   );
+    // }
+    // // kiểm tra nếu filter status khác mặc định
+    // if (filter.status !== -1) {
+    //   let filer_status = filter.status === 0 ? false : true;
+    //   tasks = tasks.filter((task) => task.status === filer_status);
+    // }
 
-    //  kiểm tra nếu có search
-    if (key !== "") {
-      // filter task java script
-      tasks = tasks.filter(
-        (task) =>
-          task.name.toLowerCase().indexOf(key.toLocaleLowerCase()) !== -1
-      );
-    }
+    // //  kiểm tra nếu có search
+    // if (key !== "") {
+    //   // filter task java script
+    //   tasks = tasks.filter(
+    //     (task) =>
+    //       task.name.toLowerCase().indexOf(key.toLocaleLowerCase()) !== -1
+    //   );
+    // }
 
     if (isDisplayForm) {
       //  nếu mà bắt thằng function bên component con thì nó sẽ ko chạy vào render luôn mà làm các thứ rồi mới render , nên nó sẽ ko chạy vào đây
       checkDisplayForm = (
         <TaskForm
-          haha={this.hideForm}
-          onSubmit={this.onSubmit}
+          // haha={this.hideForm}
+          // onSubmit={this.onSubmit}
           task={this.state.taskEditing}
         />
       );
@@ -249,30 +141,30 @@ class App extends React.Component {
       classTaskList = "col-xs-12 col-sm-12 col-md-12 col-lg-12";
     }
 
-    // hàm sort trong java script
-    if (sort.by === "name") {
-      var points = [100, 40, 1, 5, 25, 10];
-      points.sort(function (a, b) {
-        return a - b;
-      });
-      console.log(points);
+    // // hàm sort trong java script
+    // if (sort.by === "name") {
+    //   var points = [100, 40, 1, 5, 25, 10];
+    //   points.sort(function (a, b) {
+    //     return a - b;
+    //   });
+    //   console.log(points);
 
-      tasks.sort((a, b) => {
-        if (a.name > b.name) return sort.value;
-        else if (a.name < b.name) return -sort.value;
-        else {
-          return 0;
-        }
-      });
-    } else {
-      tasks.sort((a, b) => {
-        if (a.status > b.status) return -sort.value;
-        else if (a.status < b.status) return sort.value;
-        else {
-          return 0;
-        }
-      });
-    }
+    //   tasks.sort((a, b) => {
+    //     if (a.name > b.name) return sort.value;
+    //     else if (a.name < b.name) return -sort.value;
+    //     else {
+    //       return 0;
+    //     }
+    //   });
+    // } else {
+    //   tasks.sort((a, b) => {
+    //     if (a.status > b.status) return -sort.value;
+    //     else if (a.status < b.status) return sort.value;
+    //     else {
+    //       return 0;
+    //     }
+    //   });
+    // }
 
     return (
       <div className="container">
@@ -297,9 +189,6 @@ class App extends React.Component {
             <div class="row">
               <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                 <TaskList
-                  tasks={tasks}
-                  updateStatus={this.updateStatus}
-                  deleteItem={this.deleteItem}
                   updateTask={this.updateTask}
                   onFilter={this.onFilter}
                 />
@@ -312,4 +201,19 @@ class App extends React.Component {
   }
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    isDisplayForm: state.isDisplayForm,
+  };
+};
+
+const mapDispatchToProps = (dispatch, props) => {
+  // reutrn list function , call
+  return {
+    showForm: () => {
+      dispatch(action.showForm());
+    },
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

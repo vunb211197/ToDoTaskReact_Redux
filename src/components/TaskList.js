@@ -1,5 +1,6 @@
 import React from "react";
 import TaskItem from "./TaskItem";
+import {connect} from "react-redux";
 
 class TaskList extends React.Component {
   constructor(props) {
@@ -31,8 +32,6 @@ class TaskList extends React.Component {
           key={task.id}
           task={task}
           index={index}
-          updateStatus={this.props.updateStatus}
-          deleteItem={this.props.deleteItem}
           updateTask={this.props.updateTask}
         />
       );
@@ -83,4 +82,9 @@ class TaskList extends React.Component {
   }
 }
 
-export default TaskList;
+const mapStateToProps = (state) => {
+  return { tasks: state.tasks };
+};
+
+// kết nối bộ lọc mapStateToProps đến store để lấy ra state
+export default connect(mapStateToProps, null)(TaskList);
