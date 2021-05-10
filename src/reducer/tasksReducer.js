@@ -26,14 +26,22 @@ var findIndex = (tasks, id) => {
 var TaskReducer = (state = initialState, action) => {
   switch (action.type) {
     case "ADD_TASK":
-      console.log(action);
-      var id = randomId();
-      var new_task = {
-        id: id,
-        name: action.task.name,
-        status: action.task.status === "true" ? true : false,
-      };
-      state.push(new_task);
+      var id = action.task.id;
+      if (id === "") {
+        var new_task = {
+          id: randomId(),
+          name: action.task.name,
+          status: action.task.status === "true" ? true : false,
+        };
+        state.push(new_task);
+      } else {
+        var index = findIndex(state, id);
+        if (index !== -1) {
+          state[index].name = action.task.name;
+          state[index].status = action.task.status;
+        }
+      }
+
       localStorage.setItem("tasks", JSON.stringify(state));
       return [...state];
 
@@ -51,10 +59,11 @@ var TaskReducer = (state = initialState, action) => {
     case "DELETE_TASK":
       console.log(action);
       var index = findIndex(state, action.id);
-      
+
       state.splice(index, 1);
       localStorage.setItem("tasks", JSON.stringify(state));
       return [...state];
+
     default:
       return state;
   }

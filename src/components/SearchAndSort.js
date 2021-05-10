@@ -7,10 +7,10 @@ class SearchAndSort extends React.Component {
     return (
       <div className="row">
         {/* Search */}
-        <Search onSearch={this.props.onSearch} />
+        <Search  />
 
         {/* Sort */}
-        <Sort onSort={this.props.onSort}/>
+        <Sort  />
         </div>
     );
   }

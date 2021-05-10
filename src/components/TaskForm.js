@@ -6,25 +6,13 @@ class TaskForm extends React.Component {
   constructor(props) {
     super(props);
     this.hideForm = this.hideForm.bind(this);
-    // if (this.props.task == null) {
-    //   this.state = {
-    //     id: "",
-    //     name: "",
-    //     status: false,
-    //   };
-    // } else {
-    //   this.state = {
-    //     id: this.props.task.id,
-    //     name: this.props.task.name,
-    //     status: this.props.task.status,
-    //   };
-    // }
 
     this.state = {
       id: "",
       name: "",
       status: false,
     };
+    
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
     this.onClear = this.onClear.bind(this);
@@ -41,6 +29,7 @@ class TaskForm extends React.Component {
     if (name === "status") {
       value = value === "true" ? true : false;
     }
+    // set state to add
     this.setState({
       [name]: value,
     });
@@ -49,6 +38,7 @@ class TaskForm extends React.Component {
   onSubmit(e) {
     e.preventDefault();
     // 
+    console.log("sTART SUBMIT ",this.state);
     this.props.addTask(this.state);
     // cancel and close form
     this.onClear();
@@ -73,42 +63,25 @@ class TaskForm extends React.Component {
     }
   }
 
-  // static getDerivedStateFromProps(props, state) {
-  //   if (props.task) {
-  //     if(props.task.id !== state.id){
-  //       return {
-  //         id: props.task.id,
-  //         name: props.task.name,
-  //         status: props.task.status
-  //       }
-  //     }
-  //   }else{
-  //     if(state.id){
-  //       return {
-  //         id: '',
-  //         name: '',
-  //         status: true
-  //       }
-  //     }
-  //   }
-  //   return null
-  // }
-
+  // change props in components
   // có sự thay đổi props của phía components 
   // sửa -> thêm 
   // thêm -> sửa
+
   UNSAFE_componentWillReceiveProps(nextProps) {
-    console.log(nextProps);
+    console.log("hahaha",nextProps.task);
     // nếu tồn tại task ( tức là lúc ấn update)
     // add ---->update
     if (nextProps && nextProps.task) {
+      console.log("add to update");
       this.setState({
         id: nextProps.task.id,
         name: nextProps.task.name,
         status: nextProps.task.status,
       });
-    // update ----->add
+    // update ----->add 
     } else if (!nextProps.task) {
+      console.log("update to add");
       this.setState({
         id: "",
         name: "",
@@ -118,7 +91,10 @@ class TaskForm extends React.Component {
   }
 
   render() {
+    console.log("Form now is ",this.props.task);
     var titleForm = this.props.task !== null ? "Update Task" : "Add task";
+    console.log("Title form là ",titleForm);
+    
     return (
       <div className="panel panel-warning">
         <div className="panel-heading">
@@ -181,6 +157,7 @@ class TaskForm extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
+    task : state.taskEditting,
   };
 };
 

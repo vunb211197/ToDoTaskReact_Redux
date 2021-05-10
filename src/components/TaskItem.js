@@ -19,7 +19,10 @@ class TaskItem extends React.Component {
   }
 
   updateTask() {
-    this.props.updateTask(this.props.task.id);
+    // dispatch action update task with parameter task
+    this.props.updateTask(this.props.task);
+    this.props.showForm();
+
   }
 
   render() {
@@ -81,6 +84,12 @@ const mapDispatchToProps = (dispatch, props) => {
     },
     closeForm : () => {
       dispatch(action.hideForm());
+    },
+    updateTask :(task) => {
+      dispatch(action.updateTask(task))
+    },
+    showForm: () => {
+      dispatch(action.showForm());
     },
   };
 };

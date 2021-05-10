@@ -1,25 +1,19 @@
 import React from "react";
-//kdkkd
+import {connect} from "react-redux";
+import * as action from "./../action/index";
+
 class Sort extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      sortBy: "name",
-      sortValue: 1,
-    };
   }
 
   onClick(sortBy, sortValue) {
-    this.setState({
-      sortBy: sortBy,
-      sortValue: sortValue,
-    });
     this.props.onSort(sortBy,sortValue);
   }
 
   render() {
-    var sortBy = this.state.sortBy;
-    var sortValue = this.state.sortValue;
+    var sortBy = this.props.sort.sortBy;
+    var sortValue = this.props.sort.sortValue;
     var check_sort = 1;
     if(sortBy === 'name' && sortValue === -1){
       check_sort = 2;
@@ -43,7 +37,7 @@ class Sort extends React.Component {
           </button>
           <ul className="dropdown-menu">
             <li onClick={this.onClick.bind(this, "name", 1)}>
-              <a role="button" className={check_sort ===1 ? "sort_selected" : ""} >
+              <a role="button" className={check_sort === 1 ? "sort_selected" : ""} >
                 <span
                   className="fa fa-sort-alpha-asc "
                   aria-hidden="true"
@@ -71,4 +65,20 @@ class Sort extends React.Component {
   }
 }
 
-export default Sort;
+const mapStateToProps = (state) => {
+  return {
+    sort : state.onSort
+  };
+};
+
+const mapDispatchToProps = (dispatch, props) => {
+  // reutrn list function , call
+  return {
+    onSort : (sortBy,sortValue) => {
+      dispatch(action.onSort(sortBy,sortValue));
+    },
+    
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Sort);
